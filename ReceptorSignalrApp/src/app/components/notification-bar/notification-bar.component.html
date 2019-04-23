@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-12">
+      <div class="float-right">
+        <li class="dropdown" dropdown>
+          <span class="d-flex">
+            <a dropdownToggle class="dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+              aria-expanded="false" (click)="sininhoClick()" (click)="$event.preventDefault()">
+              <span>
+                <span>
+                  <i class="fas fa-bell position-relative"></i>
+                </span>
+                <span [ngStyle]="{
+                    visibility: counter == 0 ? 'hidden' : 'visible'
+                  }" class="badge badge-pill badge-danger badget-notify align-top">{{ counter }}</span>
+              </span>
+            </a>
+          </span>
+          <div *dropdownMenu class="dropdown-menu notifications dropdown-menu-right" role="menu"
+            aria-labelledby="dLabel">
+            <div class="notification-heading">
+              <h4 class="menu-title">Notifications</h4>
+              <h4 class="menu-title float-right">
+                View all<i class="fas fa-arrow-circle-right"></i>
+              </h4>
+            </div>
+        <li class="divider"></li>
+        <div class="notifications-wrapper">
+          <a class="content" href="#" *ngFor="let notification of notificationList">
+            <div class="notification-item">
+              <h4 class="item-title">{{ notification.title }}</h4>
+              <p class="item-info">{{ notification.info }}</p>
+            </div>
+          </a>
+        </div>
+        <li class="divider"></li>
+        <div class="notification-footer">
+          <h4 class="menu-title">
+            View all<i class="glyphicon glyphicon-circle-arrow-right"></i>
+          </h4>
+        </div>
+      </div>
+      </li>
+    </div>
+  </div>
+</div>
+</div>

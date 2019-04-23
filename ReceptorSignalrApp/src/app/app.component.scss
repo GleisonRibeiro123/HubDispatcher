@@ -1,0 +1,35 @@
+html,
+body {
+  min-height: 100vh;
+  // background: gray;
+}
+
+* {
+ font-size: 110%;
+//  border: 1px solid lightblue;
+}
+.container{
+  border: solid 1px black;
+}
+.row
+{
+  border: 1px solid gray;
+  border-radius: 3px;
+}
+
+.btn-periodo{
+  padding: 2px 20px;
+  font-weight: bold;
+}
+
+.canvas2{
+  height: "100px";
+}
+
+.btnClose{
+  position: absolute;
+  top: 2px;
+  right: 18px;
+  padding: 4px 5px 0px 5px;
+  z-index: 100;
+}
