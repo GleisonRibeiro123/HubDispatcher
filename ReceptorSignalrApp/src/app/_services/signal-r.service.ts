@@ -40,7 +40,7 @@ export class SignalRService {
   }
 
   // Inicia uma conexão Geral
-  startConnectionGeral() {
+  async startConnectionGeral() {
     const hub = this.routeWithHub['notify'];
     // this.startConnection(this._hubConnectionGeral, 'notify');
     try {
@@ -70,6 +70,11 @@ export class SignalRService {
       }
     );
   }
+   finishConnection() {
+
+    this._hubConnectionRotas.stop();
+    console.log('finishConnection');
+  }
 
   // Inicia conexão com rotas.
   async startConnectionRotas(rota: string) {
@@ -82,29 +87,16 @@ export class SignalRService {
     if (hubConn != null) {
       await hubConn.off('BroadcastMessage');
       console.log(`desligou escuta`);
-      // if (hubConn.state == HubConnectionState.Connected) {
-      try {
-        // const fechando = async () => {
-        //   const hubidx = this.hubsBeingClosed.push(hubConn);
-        //   hubConn
-        //     .stop()
-        //     .then(() => {
-        //       console.log(`Connection stoped at hub rotas!`);
-        //     })
-        //     .finally(() => {
-        //       this.hubsBeingClosed.splice(hubidx);
-        //     })
-        //     .catch(err => console.log(err));
-        // };
-      } catch {
-        console.log(`Olokinho, meu. Tivemos um errinho. Mas afoba não, tá tranquilo.`);
-      }
-      // }
+
+      await this.finishConnectionRota();
     }
 
     // Constroi a conexão com os Hubs dependendo das rota.
     this._hubConnectionRotas = new HubConnectionBuilder()
-      .withUrl(`http://localhost:5000/${hub}`)
+      .withUrl(`http://localhost:5000/${hub}`, {
+        skipNegotiation: true,
+        transport: HttpTransportType.WebSockets
+      })
       .build();
 
     // Inicia a conexão com o Hub da rota específica.
@@ -130,16 +122,17 @@ export class SignalRService {
   }
 
   // Finaliza a conexão de rotas.
-  // finishConnectionRota() {
-  //   const hubConn = this._hubConnectionRotas;
+  async finishConnectionRota() {
+    const hubConn = this._hubConnectionRotas;
+    // console.log(hubConn.state);
+    // console.log(HubConnectionState.Connected);
 
-  //   if (
-  //     hubConn != undefined &&
-  //     hubConn.state === HubConnectionState.Connected
-  //   ) {
-  //     return hubConn.stop();
-  //   }
-  // }
+    if (
+      hubConn.state === HubConnectionState.Connected
+    ) {
+      return await hubConn.stop();
+    }
+  }
 
   hubRotasEstaConectado() {
     return this._hubConnectionRotas.state === HubConnectionState.Connected;

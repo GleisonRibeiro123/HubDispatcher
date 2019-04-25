@@ -1,5 +1,5 @@
 import { EventDispatcherService } from '../_services/event-dispatcher.service';
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, OnDestroy } from '@angular/core';
 import { Chart } from 'chart.js';
 import { Constants } from 'src/app/util/constants';
 import { SignalRService } from 'src/app/_services/signal-r.service';
@@ -9,7 +9,8 @@ import { SignalRService } from 'src/app/_services/signal-r.service';
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss']
 })
-export class ChartComponent implements OnInit {
+export class ChartComponent implements OnInit, OnDestroy {
+
   @ViewChild('cnvsPiePizza') cnvsPiePizza: ElementRef;
   @ViewChild('cnvsNotify') cnvsNotify: ElementRef;
 
@@ -26,7 +27,7 @@ export class ChartComponent implements OnInit {
   confNotificacao = 0;
 
   constructor(
-    // private signalRService: SignalRService,
+    private signalRService: SignalRService,
   ) {}
 
   ngOnInit() {
@@ -136,5 +137,8 @@ export class ChartComponent implements OnInit {
   // Emite ações pelo botão, para testar a interface no modo 'in-memory'
   emitirAttChart() {
     // this.signalRService.emitirAtualizacaoChart();
+  }
+  ngOnDestroy(): void {
+    // this.signalRService.finishConnection();
   }
 }
