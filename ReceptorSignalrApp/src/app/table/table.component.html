@@ -1,5 +1,12 @@
-<p>
-  table works!
-</p>
+<table class="container">
+  <tr>
+    <td>Título</td>
+    <td>Informação</td>
+  </tr>
 
+  <tr *ngFor="let informacao of informacoes" class="itens">
+    <th>{{informacao.title}} </th>
+    <th>{{informacao.info}}</th>
 
+  </tr>
+</table>
