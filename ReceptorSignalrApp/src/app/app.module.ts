@@ -1,26 +1,39 @@
+import { HomeComponent } from './home/home.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
+
+import { BsDropdownModule } from 'ngx-bootstrap';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { EventDispatcherService } from './_services/event-dispatcher.service';
 import { SignalRService } from './_services/signal-r.service';
+import { ChartComponent } from './chart/chart.component';
+import { NotificationBarComponent } from './notification-bar/notification-bar.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
+import { TableComponent } from './table/table.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    NavbarComponent,
+    // ChartComponent,
+    NotificationBarComponent,
+    HomeComponent,
+    // TableComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    BsDropdownModule.forRoot(),
     HttpClientModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
   ],
   providers: [
     EventDispatcherService,
-    SignalRService
+    SignalRService,
   ],
   bootstrap: [AppComponent]
 })

@@ -15,6 +15,7 @@ namespace NotifySignalR.Controllers
             _hubContext = hubContext;
         }
 
+        //Realiza o post no BE, fazendo assim a comunicação do BE -> FE.
         [HttpPost]
         public string Post([FromBody]Message msg)
         {

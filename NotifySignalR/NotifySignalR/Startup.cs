@@ -26,6 +26,7 @@ namespace NotifySignalR
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //CORS - Fazer com que a aplicação tenha acesso as informações da API.
             services.AddCors(o => o.AddPolicy("CorsPolicy", builder => {
                 builder
                 .AllowAnyMethod()
@@ -34,6 +35,7 @@ namespace NotifySignalR
                 .AllowCredentials();
             }));
             services.AddSignalR();
+
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
@@ -56,9 +58,10 @@ namespace NotifySignalR
             app.UseCors("CorsPolicy");
             // app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
 
+            //Mapear as rotas dos diferentes HUBs existentes.
             app.UseSignalR(routes =>
             {
-                routes.MapHub<NotifyHub>("/notify");
+                routes.MapHub<NotifyHub>("/message");
                 routes.MapHub<ChartHub>("/chart");
                 routes.MapHub<TableHub>("/table");
             });

@@ -1,4 +1,4 @@
-import { EventDispatcherService } from './../../_services/event-dispatcher.service';
+import { EventDispatcherService } from '../_services/event-dispatcher.service';
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Chart } from 'chart.js';
 import { Constants } from 'src/app/util/constants';
@@ -30,10 +30,12 @@ export class ChartComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    // Informando que irá receber informações relacionadas ao 'CHART' e o que deve ser feito com as mesmas.
     EventDispatcherService.subscribe(Constants.ATUALIZACAO_CHART, (dados) => {
       this.carregaGeral(dados);
     });
 
+    // Informando que irá receber informações relacionadas ao 'NOTIFY' e o que deve ser feito com as mesmas.
     EventDispatcherService.subscribe(Constants.NOTIFICACAO, () => {
       this.confNotificacao++;
 
@@ -44,6 +46,7 @@ export class ChartComponent implements OnInit {
     });
   }
 
+  // Armazena as informações que foram recebidas.
   carregaGeral(dados: any) {
 
     this.datasetGeral = {
@@ -56,6 +59,7 @@ export class ChartComponent implements OnInit {
       labels: dados.labels
     };
 
+    // Cria o chart baseado nas informações.
     this.criaChartGeral();
   }
 
@@ -63,10 +67,12 @@ export class ChartComponent implements OnInit {
     const cnvsPiePizza = this.cnvsPiePizza.nativeElement;
 
     if (this.chartGeral != undefined) {
+      // Atribui as informações para que o grafico seja montado.
       this.chartGeral.data.labels = this.datasetGeral.labels;
       this.chartGeral.data.datasets = this.datasetGeral.datasets;
       this.chartGeral.update();
     } else {
+      // Cria um chart novo, caso não exista
       this.chartGeral = new Chart(cnvsPiePizza, {
         type: 'pie',
         data: this.datasetGeral
@@ -74,6 +80,7 @@ export class ChartComponent implements OnInit {
     }
   }
 
+  // Mesma coisa que acontece no metodo 'criarChartGeral' só que agora com as informações referente ao 'NOTIFY'
   carregaNotify(dados: any) {
 
     this.datasetNotify = {
@@ -126,6 +133,7 @@ export class ChartComponent implements OnInit {
     }
   }
 
+  // Emite ações pelo botão, para testar a interface no modo 'in-memory'
   emitirAttChart() {
     // this.signalRService.emitirAtualizacaoChart();
   }

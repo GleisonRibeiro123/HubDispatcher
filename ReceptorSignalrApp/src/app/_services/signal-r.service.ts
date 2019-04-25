@@ -1,55 +1,156 @@
 import { Constants } from './../util/constants';
 import { Injectable } from '@angular/core';
 import { EventDispatcherService } from './event-dispatcher.service';
-import { HubConnection, HubConnectionBuilder } from '@aspnet/signalr';
+import {
+  HubConnection,
+  HubConnectionBuilder,
+  HubConnectionState,
+  HttpTransportType
+} from '@aspnet/signalr';
+import { async } from 'rxjs/internal/scheduler/async';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SignalRService {
+  // Contador para aprensentar o numero de notificações recebidas
   private contador = 0;
   private cntChrt = 0;
 
-  private _hubConnection: HubConnection = null;
+  // hub fixo para app.component, usado na notificationBar
+  private _hubConnectionGeral: HubConnection;
+  // hub variavel para cada rota
+  private _hubConnectionRotas: HubConnection;
+
+  private hubsBeingClosed: HubConnection[] = [];
 
   private idx = 0;
 
-  constructor() {}
+  // coleção que relaciona rotas com hubs. Inicializada no construtor. Utilizada para realizar a conexão com os hubs
+  private routeWithHub: { [rota: string]: string } = {};
 
-  startConnection(rota: string) {
-    if(this._hubConnection != null){
-      this._hubConnection.stop();
-    }
+  constructor() {
+    this.routeWithHub['chart'] = 'chart';
+    this.routeWithHub['notify'] = 'message';
+    this.routeWithHub['table'] = 'table';
+  }
 
-    this._hubConnection = new HubConnectionBuilder()
-      .withUrl(`http://localhost:5000/${rota}`)
+  rotaPossuiHub(rota: string) {
+    return this.routeWithHub[rota] != undefined;
+  }
+
+  // Inicia uma conexão Geral
+  startConnectionGeral() {
+    const hub = this.routeWithHub['notify'];
+    // this.startConnection(this._hubConnectionGeral, 'notify');
+    try {
+    // Constroi a conexão com o Hub dependendo da rota.
+    this._hubConnectionGeral = new HubConnectionBuilder()
+      .withUrl(`http://localhost:5000/${hub}`)
       .build();
 
+    // Inicia a conexão com o hub ou mostra o erro caso aconteça.
 
+    this._hubConnectionGeral
+        .start()
+        .then(() => console.log(`Connection started at hub '${hub}'!`))
+        .catch(err => console.log('Error while establishing connection :('));
+    } catch {
 
-    this._hubConnection
-      .start()
-      .then(() => console.log(`Connection started at hub '${rota}'!`))
-      .catch(err => console.log('Error while establishing connection :('));
+    }
 
-    this._hubConnection.on(
+    // registra os dados que serão enviados.
+    this._hubConnectionGeral.on(
       'BroadcastMessage',
       (type: string, payload: any) => {
         // console.log({ type, payload });
 
+        // Método para liberar as informações que os componente irão usar.
         EventDispatcherService.publish(type, payload);
       }
     );
-
-
   }
 
-  finishConnection() {
+  // Inicia conexão com rotas.
+  async startConnectionRotas(rota: string) {
+    const hub = this.routeWithHub[rota];
+    // this.startConnection(this._hubConnectionRotas, rota);
 
+    const hubConn = this._hubConnectionRotas;
+
+    // // Confere se você continua na rota,senão estiver irá parar a conexão
+    if (hubConn != null) {
+      await hubConn.off('BroadcastMessage');
+      console.log(`desligou escuta`);
+      // if (hubConn.state == HubConnectionState.Connected) {
+      try {
+        // const fechando = async () => {
+        //   const hubidx = this.hubsBeingClosed.push(hubConn);
+        //   hubConn
+        //     .stop()
+        //     .then(() => {
+        //       console.log(`Connection stoped at hub rotas!`);
+        //     })
+        //     .finally(() => {
+        //       this.hubsBeingClosed.splice(hubidx);
+        //     })
+        //     .catch(err => console.log(err));
+        // };
+      } catch {
+        console.log(`Olokinho, meu. Tivemos um errinho. Mas afoba não, tá tranquilo.`);
+      }
+      // }
+    }
+
+    // Constroi a conexão com os Hubs dependendo das rota.
+    this._hubConnectionRotas = new HubConnectionBuilder()
+      .withUrl(`http://localhost:5000/${hub}`)
+      .build();
+
+    // Inicia a conexão com o Hub da rota específica.
+    try {
+      await this._hubConnectionRotas
+      .start()
+      .then(() => console.log(`Connection started at hub rotas!`))
+      .catch(err => console.log('Error while establishing connection :('));
+    } catch (error) {
+      console.log(`Erro ao iniciar conexão.`);
+    }
+
+    // Registra os dados que serão enviados.
+    this._hubConnectionRotas.on(
+      'BroadcastMessage',
+      (type: string, payload: any) => {
+        // console.log({ type, payload });
+
+        // Método para liberar as informaçõs que os componentes irão usar
+        EventDispatcherService.publish(type, payload);
+      }
+    );
   }
 
+  // Finaliza a conexão de rotas.
+  // finishConnectionRota() {
+  //   const hubConn = this._hubConnectionRotas;
+
+  //   if (
+  //     hubConn != undefined &&
+  //     hubConn.state === HubConnectionState.Connected
+  //   ) {
+  //     return hubConn.stop();
+  //   }
+  // }
+
+  hubRotasEstaConectado() {
+    return this._hubConnectionRotas.state === HubConnectionState.Connected;
+  }
+
+  hubRotasExiste() {
+    return this._hubConnectionRotas != undefined;
+  }
+
+  // Método usado no botão para testar sem usar o método Post, executando em memory.
   emitirNotificacao() {
-
     this.contador++;
 
     EventDispatcherService.publish(Constants.NOTIFICACAO, {
@@ -68,6 +169,7 @@ export class SignalRService {
     // }
   }
 
+  // Método usado no botão para testar sem usar o método Post, executando em memory.
   emitirAtualizacaoChart() {
     this.cntChrt++;
     EventDispatcherService.publish(Constants.ATUALIZACAO_CHART, {
