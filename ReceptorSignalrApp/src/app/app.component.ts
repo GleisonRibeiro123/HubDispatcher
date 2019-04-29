@@ -29,6 +29,30 @@ export class AppComponent implements OnInit, OnDestroy {
     private router: Router
   ) {}
 
+  ngOnInit() {
+    // se inscreve nos eventos de rota e pega apenas aqueles que são NavigationEnd
+    this.router.events
+      .pipe(filter(e => e instanceof NavigationEnd))
+      .subscribe((e: NavigationStart) => {
+        // console.log(this.router.routerState);
+
+        // Colocando a rota que está no final do header dentro da variável route
+        const route = e.url.substring(1, e.url.length);
+        console.log('rota: ' + route);
+
+        if (this.signalRService.rotaPossuiHub(route)) {
+          this.signalRService.startConnectionRotas(route);
+        }
+      });
+
+    // Criará uma conexão Geral para os componentes que estarão sempre visíveis.
+    this.signalRService.startConnectionGeral();
+  }
+
+  testeVerifyHubConnections() {
+    this.signalRService.verifyHubConnections();
+  }
+
   // Método botão para emiter uma notificação In-Memory.
   emitirNotificacao() {
     this.signalRService.emitirNotificacao();
@@ -39,45 +63,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.signalRService.emitirAtualizacaoChart();
   }
 
-  ngOnInit() {
-    // se inscreve nos eventos de rota e pega apenas aqueles que são NavigationEnd
-    this.router.events
-      .pipe(filter(e => e instanceof NavigationEnd))
-      .subscribe((e: NavigationEnd) => {
-        // console.log(this.router.routerState);
-
-        // Colocando a rota que está no final do header dentro da variável route
-        const route = e.url.substring(1, e.url.length);
-        console.log('rota: ' + route);
-
-        // Se a rota(variável) não for home ou vazio irá abrir o Hub e pegar as informações.
-        // if (this.signalRService.hubRotasExiste()
-        // // && this.signalRService.hubRotasEstaConectado()
-        // ) {
-        // this.signalRService.finishConnectionRota().then(() => {
-        if (this.signalRService.rotaPossuiHub(route)) {
-          this.signalRService.startConnectionRotas(route);
-        }
-        // });
-        // }
-        // else {
-        //   if (!this.signalRService.hubRotasExiste()) {
-        //     if (this.signalRService.rotaPossuiHub(route)) {
-        //       this.signalRService.startConnectionRotas(route);
-        //     }
-        //   }
-        // }
-      });
-
-    // Criará uma conexão Geral para os componentes que estarão sempre visíveis.
-    this.signalRService.startConnectionGeral();
-
-    // this.router.events.pipe(
-    //   filter(e => e instanceof RouterEvent)
-    // ).subscribe((e: RouterEvent)  => {
-    //   console.log(e);
-    // });
-  }
 
   ngOnDestroy() {}
 }

@@ -9,7 +9,7 @@ import { SignalRService } from 'src/app/_services/signal-r.service';
   templateUrl: './chart.component.html',
   styleUrls: ['./chart.component.scss']
 })
-export class ChartComponent implements OnInit, OnDestroy {
+export class ChartComponent implements OnInit,OnDestroy {
 
   @ViewChild('cnvsPiePizza') cnvsPiePizza: ElementRef;
   @ViewChild('cnvsNotify') cnvsNotify: ElementRef;
@@ -34,7 +34,9 @@ export class ChartComponent implements OnInit, OnDestroy {
     // Informando que irá receber informações relacionadas ao 'CHART' e o que deve ser feito com as mesmas.
     EventDispatcherService.subscribe(Constants.ATUALIZACAO_CHART, (dados) => {
       this.carregaGeral(dados);
+
     });
+
 
     // Informando que irá receber informações relacionadas ao 'NOTIFY' e o que deve ser feito com as mesmas.
     EventDispatcherService.subscribe(Constants.NOTIFICACAO, () => {
@@ -45,6 +47,7 @@ export class ChartComponent implements OnInit, OnDestroy {
         data: [this.confNotificacao, 10]
       });
     });
+
   }
 
   // Armazena as informações que foram recebidas.
@@ -138,7 +141,8 @@ export class ChartComponent implements OnInit, OnDestroy {
   emitirAttChart() {
     // this.signalRService.emitirAtualizacaoChart();
   }
+
   ngOnDestroy(): void {
-    // this.signalRService.finishConnection();
+    this.signalRService.finishConnectionRota();
   }
 }

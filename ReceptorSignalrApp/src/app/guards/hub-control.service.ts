@@ -1,25 +1,24 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanDeactivate, RouterStateSnapshot } from '@angular/router';
+import { CanDeactivate} from '@angular/router';
 import { Observable } from 'rxjs';
-import { ChartComponent } from '../chart/chart.component';
+
+import { componentFactoryName } from '@angular/compiler';
+
+export interface CanComponentDeactivate {
+  CanDeactivate: () => Observable<boolean> | Promise<boolean> | boolean;
+}
 
 @Injectable(
 //   {
 //   // providedIn: 'root'
 // }
 )
-export class HubControlService implements CanDeactivate<ChartComponent> {
+export class HubControlService implements CanDeactivate<CanComponentDeactivate> {
 
   constructor() { }
 
-  canDeactivate(
-    component: ChartComponent,
-    currentRoute: ActivatedRouteSnapshot,
-    currentState: RouterStateSnapshot
-  ): boolean {
-
-
-    return false;
+  canDeactivate(component: CanComponentDeactivate){
+    return component.CanDeactivate ? component.CanDeactivate() : true;
   }
 
 
